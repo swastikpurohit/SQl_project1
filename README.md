@@ -1,143 +1,213 @@
-# SQL Mock Interview Series
+# Retail Sales Analysis SQL Project
 
-## SQL Mock Interview 2
+## Project Overview
 
-### Questions
+**Project Title**: Retail Sales Analysis  
+**Level**: Beginner  
+**Database**: `p1_retail_db`
 
-1. **What is the difference between a View and a Materialized View in SQL?**
+This project is designed to demonstrate SQL skills and techniques typically used by data analysts to explore, clean, and analyze retail sales data. The project involves setting up a retail sales database, performing exploratory data analysis (EDA), and answering specific business questions through SQL queries. This project is ideal for those who are starting their journey in data analysis and want to build a solid foundation in SQL.
 
-2. **What is the difference between UNION and UNION ALL?**
+## Objectives
 
-3. **Self Join vs Cross Join:**  
-   Explain the differences and provide examples for both.
+1. **Set up a retail sales database**: Create and populate a retail sales database with the provided sales data.
+2. **Data Cleaning**: Identify and remove any records with missing or null values.
+3. **Exploratory Data Analysis (EDA)**: Perform basic exploratory data analysis to understand the dataset.
+4. **Business Analysis**: Use SQL to answer specific business questions and derive insights from the sales data.
 
-4. **Self Join Query:**  
-   Write an SQL query to find employees along with their manager's name and salary.
+## Project Structure
 
-5. **Recursive CTE Query:**  
-   Write an SQL query using a recursive CTE to find employees along with their manager's name and salary.
+### 1. Database Setup
 
-6. **Find Top Hotels by Stays:**  
-   Write an SQL query to find the top 4 hotels in each month with the highest number of stays.
+- **Database Creation**: The project starts by creating a database named `p1_retail_db`.
+- **Table Creation**: A table named `retail_sales` is created to store the sales data. The table structure includes columns for transaction ID, sale date, sale time, customer ID, gender, age, product category, quantity sold, price per unit, cost of goods sold (COGS), and total sale amount.
 
----
-
-### Dataset 1: Employee and Department Tables
-
-#### Employee Table (`emp`)
 ```sql
-CREATE TABLE emp (
-    emp_id INT PRIMARY KEY,        
-    emp_name VARCHAR(100),         
-    salary DECIMAL(10, 2),         
-    department_id INT,             
-    manager_id INT                 
+CREATE DATABASE p1_retail_db;
+
+CREATE TABLE retail_sales
+(
+    transactions_id INT PRIMARY KEY,
+    sale_date DATE,	
+    sale_time TIME,
+    customer_id INT,	
+    gender VARCHAR(10),
+    age INT,
+    category VARCHAR(35),
+    quantity INT,
+    price_per_unit FLOAT,	
+    cogs FLOAT,
+    total_sale FLOAT
 );
-
-INSERT INTO emp (emp_id, emp_name, salary, department_id, manager_id) VALUES
-(1, 'Alice Johnson', 75000, 101, NULL),   
-(2, 'Bob Smith', 95000, 101, 1),         
-(3, 'Charlie Davis', 55000, 102, NULL),  
-(4, 'Diana Prince', 85000, 102, 3),      
-(5, 'Eve Adams', 40000, 103, 1),         
-(6, 'Frank Taylor', 60000, NULL, 1),     
-(7, 'Grace Lee', 80000, 101, 1),         
-(8, 'Helen Carter', 65000, NULL, 3),      
-(9, 'Ivy Brown', 87000, 102, 3),        
-(10, 'Jack Wilson', 50000, 103, 1),      
-(11, 'Karen White', 75000, 103, 1);
 ```
 
-#### Department Table (`dept`)
+### 2. Data Exploration & Cleaning
+
+- **Record Count**: Determine the total number of records in the dataset.
+- **Customer Count**: Find out how many unique customers are in the dataset.
+- **Category Count**: Identify all unique product categories in the dataset.
+- **Null Value Check**: Check for any null values in the dataset and delete records with missing data.
+
 ```sql
-CREATE TABLE dept (
-    department_id INT PRIMARY KEY,     
-    department_name VARCHAR(100)      
-);
+SELECT COUNT(*) FROM retail_sales;
+SELECT COUNT(DISTINCT customer_id) FROM retail_sales;
+SELECT DISTINCT category FROM retail_sales;
 
-INSERT INTO dept (department_id, department_name) 
-VALUES
-(101, 'Human Resources'),
-(102, 'Engineering'),
-(103, 'Finance'),
-(104, 'IT'),
-(105, 'Marketing');
+SELECT * FROM retail_sales
+WHERE 
+    sale_date IS NULL OR sale_time IS NULL OR customer_id IS NULL OR 
+    gender IS NULL OR age IS NULL OR category IS NULL OR 
+    quantity IS NULL OR price_per_unit IS NULL OR cogs IS NULL;
+
+DELETE FROM retail_sales
+WHERE 
+    sale_date IS NULL OR sale_time IS NULL OR customer_id IS NULL OR 
+    gender IS NULL OR age IS NULL OR category IS NULL OR 
+    quantity IS NULL OR price_per_unit IS NULL OR cogs IS NULL;
 ```
 
-#### Preview Data
+### 3. Data Analysis & Findings
+
+The following SQL queries were developed to answer specific business questions:
+
+1. **Write a SQL query to retrieve all columns for sales made on '2022-11-05**:
 ```sql
-SELECT * FROM emp;
-SELECT * FROM dept;
+SELECT *
+FROM retail_sales
+WHERE sale_date = '2022-11-05';
 ```
 
----
-
-### Dataset 2: Hotels and Bookings Tables
-
-#### Hotels Table
+2. **Write a SQL query to retrieve all transactions where the category is 'Clothing' and the quantity sold is more than 4 in the month of Nov-2022**:
 ```sql
-CREATE TABLE Hotels (
-    hotel_id SERIAL PRIMARY KEY,
-    hotel_name VARCHAR(255) NOT NULL
-);
-
-INSERT INTO Hotels (hotel_name)
-VALUES 
-    ('Hotel A'),
-    ('Hotel B'),
-    ('Hotel C'),
-    ('Hotel D'),
-    ('Hotel E');
+SELECT 
+  *
+FROM retail_sales
+WHERE 
+    category = 'Clothing'
+    AND 
+    TO_CHAR(sale_date, 'YYYY-MM') = '2022-11'
+    AND
+    quantity >= 4
 ```
 
-#### Bookings Table
+3. **Write a SQL query to calculate the total sales (total_sale) for each category.**:
 ```sql
-CREATE TABLE Bookings (
-    booking_id SERIAL PRIMARY KEY,
-    booking_date DATE NOT NULL,
-    checkin_date DATE NOT NULL,
-    hotel_id INT NOT NULL,
-    FOREIGN KEY (hotel_id) REFERENCES Hotels(hotel_id)
-);
-
-INSERT INTO Bookings (booking_date, checkin_date, hotel_id)
-VALUES
-    ('2024-01-01', '2024-01-02', 1),
-    ('2024-01-03', '2024-01-04', 2),
-    ('2024-01-04', '2024-01-05', 1),
-    ('2024-01-05', '2024-01-06', 3),
-    ('2024-01-10', '2024-01-11', 4),
-    ('2024-02-01', '2024-02-02', 1),
-    ('2024-02-03', '2024-02-04', 5),
-    ('2024-02-05', '2024-02-06', 2),
-    ('2024-02-06', '2024-02-07', 3),
-    ('2024-02-07', '2024-02-08', 1),
-    ('2024-02-09', '2024-02-10', 4),
-    ('2024-03-01', '2024-03-02', 3),
-    ('2024-03-03', '2024-03-04', 1),
-    ('2024-03-05', '2024-03-06', 2),
-    ('2024-03-07', '2024-03-08', 4),
-    ('2024-03-09', '2024-03-10', 5),
-    ('2024-04-01', '2024-04-02', 1),
-    ('2024-04-03', '2024-04-04', 2),
-    ('2024-04-05', '2024-04-06', 3),
-    ('2024-04-07', '2024-04-08', 4),
-    ('2024-04-09', '2024-04-10', 5),
-    ('2024-05-01', '2024-05-02', 1),
-    ('2024-05-03', '2024-05-04', 2),
-    ('2024-05-05', '2024-05-06', 3),
-    ('2024-05-07', '2024-05-08', 4),
-    ('2024-05-09', '2024-05-10', 5),
-    ('2024-06-01', '2024-06-02', 1),
-    ('2024-06-03', '2024-06-04', 2),
-    ('2024-06-05', '2024-06-06', 3),
-    ('2024-06-07', '2024-06-08', 4),
-    ('2024-06-09', '2024-06-10', 5),
-    ('2024-07-01', '2024-07-02', 1),
-    ('2024-07-03', '2024-07-04', 2),
-    ('2024-07-05', '2024-07-06', 3);
+SELECT 
+    category,
+    SUM(total_sale) as net_sale,
+    COUNT(*) as total_orders
+FROM retail_sales
+GROUP BY 1
 ```
 
---- 
+4. **Write a SQL query to find the average age of customers who purchased items from the 'Beauty' category.**:
+```sql
+SELECT
+    ROUND(AVG(age), 2) as avg_age
+FROM retail_sales
+WHERE category = 'Beauty'
+```
 
-### End of Dataset
+5. **Write a SQL query to find all transactions where the total_sale is greater than 1000.**:
+```sql
+SELECT * FROM retail_sales
+WHERE total_sale > 1000
+```
+
+6. **Write a SQL query to find the total number of transactions (transaction_id) made by each gender in each category.**:
+```sql
+SELECT 
+    category,
+    gender,
+    COUNT(*) as total_trans
+FROM retail_sales
+GROUP 
+    BY 
+    category,
+    gender
+ORDER BY 1
+```
+
+7. **Write a SQL query to calculate the average sale for each month. Find out best selling month in each year**:
+```sql
+SELECT 
+       year,
+       month,
+    avg_sale
+FROM 
+(    
+SELECT 
+    EXTRACT(YEAR FROM sale_date) as year,
+    EXTRACT(MONTH FROM sale_date) as month,
+    AVG(total_sale) as avg_sale,
+    RANK() OVER(PARTITION BY EXTRACT(YEAR FROM sale_date) ORDER BY AVG(total_sale) DESC) as rank
+FROM retail_sales
+GROUP BY 1, 2
+) as t1
+WHERE rank = 1
+```
+
+8. **Write a SQL query to find the top 5 customers based on the highest total sales **:
+```sql
+SELECT 
+    customer_id,
+    SUM(total_sale) as total_sales
+FROM retail_sales
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 5
+```
+
+9. **Write a SQL query to find the number of unique customers who purchased items from each category.**:
+```sql
+SELECT 
+    category,    
+    COUNT(DISTINCT customer_id) as cnt_unique_cs
+FROM retail_sales
+GROUP BY category
+```
+
+10. **Write a SQL query to create each shift and number of orders (Example Morning <12, Afternoon Between 12 & 17, Evening >17)**:
+```sql
+WITH hourly_sale
+AS
+(
+SELECT *,
+    CASE
+        WHEN EXTRACT(HOUR FROM sale_time) < 12 THEN 'Morning'
+        WHEN EXTRACT(HOUR FROM sale_time) BETWEEN 12 AND 17 THEN 'Afternoon'
+        ELSE 'Evening'
+    END as shift
+FROM retail_sales
+)
+SELECT 
+    shift,
+    COUNT(*) as total_orders    
+FROM hourly_sale
+GROUP BY shift
+```
+
+## Findings
+
+- **Customer Demographics**: The dataset includes customers from various age groups, with sales distributed across different categories such as Clothing and Beauty.
+- **High-Value Transactions**: Several transactions had a total sale amount greater than 1000, indicating premium purchases.
+- **Sales Trends**: Monthly analysis shows variations in sales, helping identify peak seasons.
+- **Customer Insights**: The analysis identifies the top-spending customers and the most popular product categories.
+
+## Reports
+
+- **Sales Summary**: A detailed report summarizing total sales, customer demographics, and category performance.
+- **Trend Analysis**: Insights into sales trends across different months and shifts.
+- **Customer Insights**: Reports on top customers and unique customer counts per category.
+
+## Conclusion
+
+This project serves as a comprehensive introduction to SQL for data analysts, covering database setup, data cleaning, exploratory data analysis, and business-driven SQL queries. The findings from this project can help drive business decisions by understanding sales patterns, customer behavior, and product performance.
+
+## Author - Swastik Purohit
+
+
+
+- **LinkedIn**: [Connect with me professionally](https://www.linkedin.com/in/swastik-purohit-0a1477251/)
+- **E-mail**: [Connect with me](swastikp107@gmail.com)
+
