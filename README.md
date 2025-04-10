@@ -20,12 +20,12 @@ This project is designed to demonstrate SQL skills and techniques typically used
 ### 1. Database Setup
 
 - **Database Creation**: The project starts by creating a database named `p1_retail_db`.
-- **Table Creation**: A table named `retail_sales` is created to store the sales data. The table structure includes columns for transaction ID, sale date, sale time, customer ID, gender, age, product category, quantity sold, price per unit, cost of goods sold (COGS), and total sale amount.
+- **Table Creation**: A table named `retail_sale` is created to store the sales data. The table structure includes columns for transaction ID, sale date, sale time, customer ID, gender, age, product category, quantity sold, price per unit, cost of goods sold (COGS), and total sale amount.
 
 ```sql
 CREATE DATABASE p1_retail_db;
 
-CREATE TABLE retail_sales
+CREATE TABLE retail_sale
 (
     transactions_id INT PRIMARY KEY,
     sale_date DATE,	
@@ -49,17 +49,17 @@ CREATE TABLE retail_sales
 - **Null Value Check**: Check for any null values in the dataset and delete records with missing data.
 
 ```sql
-SELECT COUNT(*) FROM retail_sales;
-SELECT COUNT(DISTINCT customer_id) FROM retail_sales;
-SELECT DISTINCT category FROM retail_sales;
+SELECT COUNT(*) FROM retail_sale;
+SELECT COUNT(DISTINCT customer_id) FROM retail_sale;
+SELECT DISTINCT category FROM retail_sale;
 
-SELECT * FROM retail_sales
+SELECT * FROM retail_sale
 WHERE 
     sale_date IS NULL OR sale_time IS NULL OR customer_id IS NULL OR 
     gender IS NULL OR age IS NULL OR category IS NULL OR 
     quantity IS NULL OR price_per_unit IS NULL OR cogs IS NULL;
 
-DELETE FROM retail_sales
+DELETE FROM retail_sale
 WHERE 
     sale_date IS NULL OR sale_time IS NULL OR customer_id IS NULL OR 
     gender IS NULL OR age IS NULL OR category IS NULL OR 
@@ -73,7 +73,7 @@ The following SQL queries were developed to answer specific business questions:
 1. **Write a SQL query to retrieve all columns for sales made on '2022-11-05**:
 ```sql
 SELECT *
-FROM retail_sales
+FROM retail_sale
 WHERE sale_date = '2022-11-05';
 ```
 
@@ -81,7 +81,7 @@ WHERE sale_date = '2022-11-05';
 ```sql
 SELECT 
   *
-FROM retail_sales
+FROM retail_sale
 WHERE 
     category = 'Clothing'
     AND 
@@ -96,7 +96,7 @@ SELECT
     category,
     SUM(total_sale) as net_sale,
     COUNT(*) as total_orders
-FROM retail_sales
+FROM retail_sale
 GROUP BY 1
 ```
 
@@ -104,13 +104,13 @@ GROUP BY 1
 ```sql
 SELECT
     ROUND(AVG(age), 2) as avg_age
-FROM retail_sales
+FROM retail_sale
 WHERE category = 'Beauty'
 ```
 
 5. **Write a SQL query to find all transactions where the total_sale is greater than 1000.**:
 ```sql
-SELECT * FROM retail_sales
+SELECT * FROM retail_sale
 WHERE total_sale > 1000
 ```
 
@@ -120,7 +120,7 @@ SELECT
     category,
     gender,
     COUNT(*) as total_trans
-FROM retail_sales
+FROM retail_sale
 GROUP 
     BY 
     category,
@@ -141,7 +141,7 @@ SELECT
     EXTRACT(MONTH FROM sale_date) as month,
     AVG(total_sale) as avg_sale,
     RANK() OVER(PARTITION BY EXTRACT(YEAR FROM sale_date) ORDER BY AVG(total_sale) DESC) as rank
-FROM retail_sales
+FROM retail_sale
 GROUP BY 1, 2
 ) as t1
 WHERE rank = 1
@@ -152,7 +152,7 @@ WHERE rank = 1
 SELECT 
     customer_id,
     SUM(total_sale) as total_sales
-FROM retail_sales
+FROM retail_sale
 GROUP BY 1
 ORDER BY 2 DESC
 LIMIT 5
@@ -163,7 +163,7 @@ LIMIT 5
 SELECT 
     category,    
     COUNT(DISTINCT customer_id) as cnt_unique_cs
-FROM retail_sales
+FROM retail_sale
 GROUP BY category
 ```
 
@@ -178,7 +178,7 @@ SELECT *,
         WHEN EXTRACT(HOUR FROM sale_time) BETWEEN 12 AND 17 THEN 'Afternoon'
         ELSE 'Evening'
     END as shift
-FROM retail_sales
+FROM retail_sale
 )
 SELECT 
     shift,
